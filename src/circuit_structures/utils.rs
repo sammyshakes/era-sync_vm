@@ -63,6 +63,18 @@ pub fn constraint_bit_length<E: Engine, CS: ConstraintSystem<E>>(
         Num::Constant(value) => {
             let bits = value.into_repr().num_bits() as usize;
             assert!(bits <= num_bits);
+            // let mut v = Vec::<franklin_crypto::plonk::circuit::allocated_num::Num<E>>::new();
+
+            // v.push(value.get_value());
+            // v
+            let mut half_num_chunks = bits / 16;
+            if bits % 16 != 0 {
+                half_num_chunks += 1;
+            }
+            let chunks1 = split_into_slices(value, 8, half_num_chunks * 2);
+            let as_num: Vec<_> = chunks1.into_iter().map(|el| Num::Constant(el)).collect();
+
+            as_num
         }
     };
 
